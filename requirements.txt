@@ -1,0 +1,10 @@
+numpy
+streamlit
+pydeck
+pandas
+seaborn
+opencv-python-headless
+
+
+
+
