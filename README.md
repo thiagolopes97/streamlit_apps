@@ -1,6 +1,6 @@
 # Streamlit App - Thiago Lopes
 
-Criação de um aplicativo utilizando a biblioteca Streamlit para divulgação de alguns projetos criados por mim. Acesso ao [App](https://bit.ly/3uXJOTF).
+Criação de um aplicativo utilizando a biblioteca Streamlit para divulgação de alguns projetos criados por mim. Acesso ao [App](https://share.streamlit.io/thiagolopes97/streamlit_apps/app.py).
 
 Os scripts destes projetos estarão disponíveis neste repositório. O mesmo está organizado em:
 - app.py
