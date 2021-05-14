@@ -17,7 +17,7 @@ def inicio_func():
     st.header("Filtro - App")
     st.markdown("""**1º** Projeto da Masterclass Introdução à Visão Computacional, do Carlos Melo (Sigmoidal).
                 Para saber mais sobre a Masterclass, acesse [esta página](https://pay.hotmart.com/K44730436X?checkoutMode=10&bid=1608039415553).
-                """)
+                Link do [Script](https://github.com/thiagolopes97/streamlit_apps/blob/master/parts/filtro.py) no Github.""")
     st.subheader("Exemplo de funcionalidade do app")
     col1, col2 = st.beta_columns(2)
 
@@ -36,7 +36,7 @@ def inicio_func():
     st.header("Visualização de Dados de acidente aêreo - CENIPA")
     st.markdown("""**2º** Projeto da Masterclass Introdução à Visão Computacional, do Carlos Melo (Sigmoidal).
                 Para saber mais sobre a Masterclass, acesse [esta página](https://pay.hotmart.com/K44730436X?checkoutMode=10&bid=1608039415553).
-                """)
+                Link do [Script](https://github.com/thiagolopes97/streamlit_apps/blob/master/parts/cenipa.py) no Github.""")
     st.subheader("Exemplo de funcionalidade do app")
     img = Image.open('images/exemplo1.png')
     st.image(img, caption="Visualização dos dados do CENIPA", use_column_width=True)

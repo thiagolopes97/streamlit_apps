@@ -6,13 +6,10 @@
 # Importação das bibliotecas
 import streamlit as st
 import pandas as pd
-import pydeck as pdk
-import seaborn as sns
-import numpy as np
-import matplotlib.pyplot as plt
+import plotly.express as px
+from plotly.subplots import make_subplots
 
 # Link original do dataset: https://raw.githubusercontent.com/carlosfab/curso_data_science_na_pratica/master/modulo_02/ocorrencias_aviacao.csv
-#DATA_URL = "https://raw.githubusercontent.com/thiagolopes97/CENIPA_Visu/master/data/ocorrencias_aviacao.csv"
 DATA_URL = "data/ocorrencias_aviacao.csv"
 @st.cache
 def load_data():
@@ -69,6 +66,8 @@ dict_month ={1: "Janeiro",
 
 # Carregando a página Projeto Cenipa
 def cenipa_func():
+
+
     # Carregar dados
     df = load_data()
     # Limpar outliers de localização
@@ -133,7 +132,6 @@ def cenipa_func():
     dist4 = st.sidebar.empty()
     count1 = st.sidebar.empty()
     count2 = st.sidebar.empty()
-    count3 = st.sidebar.empty()
 
     # Aqui o placehoder vazio finalmente é atualizado com dados do filtered_df
     info_sidebar.info("{} ocorrências selecionadas de um total de {}.".format(filtered_df.shape[0],df.shape[0]))
@@ -151,72 +149,233 @@ def cenipa_func():
     st.subheader("Mapa de ocorrências")
     st.map(filtered_df)
 
+    # Comon graphical params
+    axes_size = 20
+
     # raw data (tabela) dependente do checkbox
     if tabela.checkbox("Mostrar tabela de dados"):
+        st.markdown(''' ------ ''')
         st.write(filtered_df)
+
     if dist1.checkbox("Latitude e Longitude"):
-        plt.figure(figsize=(8, 4))
-        plt.subplot(1, 2, 1)
-        fig = sns.distplot(filtered_df.longitude,color='#ff2b2b')
-        plt.title("Distribuição de ocorrências por longitude")
-        plt.ylabel("%")
-        plt.subplot(1, 2, 2)
-        fig = sns.distplot(filtered_df.latitude,color='#ff2b2b')
-        plt.title("Distribuição de ocorrências por Latitude")
-        plt.tight_layout()
-        st.pyplot();
+        st.markdown(''' ------ ''')
+        fig = make_subplots(rows=1, cols=2, subplot_titles=("Latitude",
+                                                           "Longitude"))
+
+        # Printing information number
+
+        fig.add_histogram(x=filtered_df.latitude,
+                          nbinsx=8,
+                          legendgroup="latitude",
+                          name="Latitude", showlegend=True,
+                          xaxis="x",
+                          histfunc='sum',  # ['count', 'sum', 'avg', 'min', 'max']
+                          histnorm='percent',  # ['', 'percent', 'probability', 'density', 'probability density']
+                          hoverinfo='x + y',
+                          text=["skip"],  # ['all', 'none', 'skip']
+                          marker=dict(color="#00002B"),row=1, col=1)
+        fig.add_histogram(x=filtered_df.longitude,
+                          nbinsx=8,
+                          legendgroup="longitude",
+                          name="Longitude", showlegend=True,
+                          xaxis="x",
+                          histfunc='sum',  # ['count', 'sum', 'avg', 'min', 'max']
+                          histnorm='percent',  # ['', 'percent', 'probability', 'density', 'probability density']
+                          hoverinfo='x + y',
+                          text=["skip"],  # ['all', 'none', 'skip']
+                          marker=dict(color="#FF2B2B"), row=1, col=2)
+        # Layout formating
+
+
+        #X-AXES
+        fig.update_xaxes(title_text="Graus", showgrid=False,  row=1, col=1)
+        fig.update_xaxes(title_text="Graus", showgrid=False, row=1, col=2)
+
+        #Y-AXES
+        fig.update_yaxes(title_text="Porcentagem do dataset",
+                         ticktext=["0%", "10%", "20%", "30%", "40%"],
+                         tickvals=[0, 10, 20, 30, 40],
+                         tickmode="array",
+                         titlefont=dict(family='Arial',
+                                        size=axes_size,
+                                        color='#000000'),
+                         range=[0, 50],
+                         row=1, col=1)
+        fig.update_yaxes(ticktext=["0%", "10%", "20%", "30%", "40%"],
+                         tickvals=[0, 10, 20, 30, 40],
+                         tickmode="array",
+                         titlefont=dict(family='Arial',
+                                        size=axes_size,
+                                        color='#FFFFFF'),
+                         range=[0, 50],
+                         row=1,col=2)
+
+
+        #  GENERAL UPDATE
+        fig.update_layout(title=dict(text="Distribuição dos dados por Latitude e Longitude",
+                                     yref='container',  # ['paper', 'container']
+                                     xref='container',  # ['paper', 'container']
+                                     x=0.5, y=0.92,
+                                     yanchor="auto",  # ['auto', 'top', 'middle', 'bottom']
+                                     xanchor="auto",  # ['auto', 'left', 'center', 'right']
+                                     font=dict(family='Arial', # "Arial", "Balto", "Courier New", "Droid Sans", "Droid Serif", "Droid Sans Mono", "Gravitas One", "Old Standard TT", "Open Sans", "Overpass", "PT Sans Narrow", "Raleway", "Times New Roman"
+                                               size=25,
+                                               color='#000000')),
+                          height=500, width=815,
+                          showlegend=True)
+        st.plotly_chart(fig, use_container_width=False)
 
     if dist2.checkbox("Mês do ano"):
+        st.markdown(''' ------ ''')
         month = filtered_df.data.dt.month.sort_values().map(dict_month)
-        plt.figure(figsize=(10, 4))
-        fig = sns.countplot(month,color="#ff2b2b")
-        plt.ylabel("Nº de ocorrências")
-        plt.xlabel("")
-        plt.title("Número de ocorrências/ mês")
-        plt.tight_layout()
-        st.pyplot();
+
+
+        fig = px.histogram(month,x="data",color_discrete_sequence=['#ff2b2b'],histnorm="",
+                           hover_data=[month])
+                           #hover_data="data")
+
+        fig.update_xaxes(title_text="Mês do ano", showgrid=False,
+                         titlefont=dict(family='Arial',
+                                        size=axes_size,
+                                        color='#000000'),
+                         )
+        fig.update_yaxes(title_text="Número de ocorrências", showgrid=False,
+                         titlefont=dict(family='Arial',
+                                        size=axes_size,
+                                        color='#000000'),
+                         )
+        fig.update_layout(title=dict(text="Distribuição das ocorrências por Mês",
+                                     yref='container',  # ['paper', 'container']
+                                     xref='container',  # ['paper', 'container']
+                                     x=0.5, y=0.93,
+                                     yanchor="auto",  # ['auto', 'top', 'middle', 'bottom']
+                                     xanchor="auto",  # ['auto', 'left', 'center', 'right']
+                                     font=dict(family='Arial', # "Arial", "Balto", "Courier New", "Droid Sans", "Droid Serif", "Droid Sans Mono", "Gravitas One", "Old Standard TT", "Open Sans", "Overpass", "PT Sans Narrow", "Raleway", "Times New Roman"
+                                               size=25,
+                                               color='#000000')),
+                          height=500, width=800,
+                          showlegend=False, hovermode=False)
+
+
+        st.plotly_chart(fig)
 
     if dist3.checkbox("Dia da semana"):
+        st.markdown(''' ------ ''')
         week = filtered_df.data.dt.dayofweek.sort_values().map(dict_day)
-        plt.figure(figsize=(10, 4))
-        fig = sns.countplot(week,color="#ff2b2b")
-        plt.xlabel("")
-        plt.ylabel("Nº de ocorrências")
-        plt.title("Número de ocorrências/ dia da semana")
-        plt.tight_layout()
-        st.pyplot();
+        fig = px.histogram(week, x="data", color_discrete_sequence=['#ff2b2b'], histnorm="",
+                           hover_data=[week])
+
+        fig.update_xaxes(title_text="Dia da semana", showgrid=False,
+                         titlefont=dict(family='Arial',
+                                        size=axes_size,
+                                        color='#000000'),
+                         )
+        fig.update_yaxes(title_text="Número de ocorrências", showgrid=False,
+                         titlefont=dict(family='Arial',
+                                        size=axes_size,
+                                        color='#000000'),
+                         )
+        fig.update_layout(title=dict(text="Distribuição das ocorrências por dia da semana",
+                                     yref='container',  # ['paper', 'container']
+                                     xref='container',  # ['paper', 'container']
+                                     x=0.5, y=0.93,
+                                     yanchor="auto",  # ['auto', 'top', 'middle', 'bottom']
+                                     xanchor="auto",  # ['auto', 'left', 'center', 'right']
+                                     font=dict(family='Arial',
+                                               # "Arial", "Balto", "Courier New", "Droid Sans", "Droid Serif", "Droid Sans Mono", "Gravitas One", "Old Standard TT", "Open Sans", "Overpass", "PT Sans Narrow", "Raleway", "Times New Roman"
+                                               size=25,
+                                               color='#000000')),
+                          height=500, width=800,
+                          showlegend=False, hovermode="closest")
+        st.plotly_chart(fig)
 
     if dist4.checkbox("Horário"):
+        st.markdown(''' ------ ''')
         hora = filtered_df.data.dt.hour
-        fig = sns.countplot(hora,color="#ff2b2b")
-        plt.ylabel("Nº de ocorrências")
-        plt.title("Número de ocorrências/ horário")
-        plt.tight_layout()
-        st.pyplot();
+        fig = px.histogram(x= hora,nbins=24, color_discrete_sequence=['#ff2b2b'], histnorm="",
+                           hover_data=[hora])
+
+        fig.update_xaxes(title_text="Horário", showgrid=False,
+                         titlefont=dict(family='Arial',
+                                        size=axes_size,
+                                        color='#000000'),
+                         )
+        fig.update_yaxes(title_text="Número de ocorrências", showgrid=False,
+                         titlefont=dict(family='Arial',
+                                        size=axes_size,
+                                        color='#000000'),
+                         )
+        fig.update_layout(title=dict(text="Distribuição das ocorrências por horário",
+                                     yref='container',  # ['paper', 'container']
+                                     xref='container',  # ['paper', 'container']
+                                     x=0.5, y=0.93,
+                                     yanchor="auto",  # ['auto', 'top', 'middle', 'bottom']
+                                     xanchor="auto",  # ['auto', 'left', 'center', 'right']
+                                     font=dict(family='Arial',
+                                               # "Arial", "Balto", "Courier New", "Droid Sans", "Droid Serif", "Droid Sans Mono", "Gravitas One", "Old Standard TT", "Open Sans", "Overpass", "PT Sans Narrow", "Raleway", "Times New Roman"
+                                               size=25,
+                                               color='#000000')),
+                          height=500, width=800,
+                          showlegend=False, hovermode="closest")
+        st.plotly_chart(fig)
 
     if count1.checkbox("Classificação"):
-        fig = sns.countplot(x='classificacao',data=filtered_df,color="#ff2b2b")
-        plt.title("Número de ocorrências/ classificação")
-        plt.ylabel("Nº de ocorrências")
-        plt.tight_layout()
-        st.pyplot();
+        st.markdown(''' ------ ''')
+
+        fig = px.histogram(filtered_df, x="classificacao",
+                           opacity=0.95,
+                           color_discrete_sequence=['#ff2b2b'],
+                           hover_data=[hora])
+        fig.update_xaxes(title_text="Classificação", showgrid=False,
+                         titlefont=dict(family='Arial',
+                                        size=axes_size,
+                                        color='#000000'),
+                         )
+        fig.update_yaxes(title_text="Número de ocorrências", showgrid=False,
+                         titlefont=dict(family='Arial',
+                                        size=axes_size,
+                                        color='#000000'),
+                         )
+        fig.update_layout(title=dict(text="Distribuição das ocorrências por classificação",
+                                     yref='container',  # ['paper', 'container']
+                                     xref='container',  # ['paper', 'container']
+                                     x=0.5, y=0.93,
+                                     yanchor="auto",  # ['auto', 'top', 'middle', 'bottom']
+                                     xanchor="auto",  # ['auto', 'left', 'center', 'right']
+                                     font=dict(family='Arial',
+                                               # "Arial", "Balto", "Courier New", "Droid Sans", "Droid Serif", "Droid Sans Mono", "Gravitas One", "Old Standard TT", "Open Sans", "Overpass", "PT Sans Narrow", "Raleway", "Times New Roman"
+                                               size=25,
+                                               color='#000000')),
+                          height=500, width=800,
+                          showlegend=False, hovermode="closest")
+        st.plotly_chart(fig)
 
     if count2.checkbox("Tipo de ocorrência"):
-        plt.figure(figsize=(10,6.5))
-        fig = sns.countplot(y='tipo_categoria',data=filtered_df,color="#ff2b2b")
-        plt.ylabel("")
-        plt.xlabel("Nº de ocorrências")
-        plt.title("Número de ocorrências/ tipo")
-        plt.tight_layout()
-        st.pyplot();
+        fig = px.histogram(filtered_df, y="tipo", opacity=0.95,
+                           color_discrete_sequence=['#ff2b2b'],
+                           hover_data=[hora])
 
-    if count3.checkbox("Cidades mais comuns"):
-        plt.figure(figsize=(10,6.5))
-        nome = filtered_df.cidade.value_counts().sort_values(ascending=False).index[:10]
-        valor = filtered_df.cidade.value_counts().sort_values(ascending=False)[:10]
-        fig = plt.barh(y=nome,width=valor,color="#ff2b2b")
-        plt.ylabel("")
-        plt.xlabel("Nº de ocorrências")
-        plt.title("Top 10 - Número de ocorrências/ cidade")
-        plt.tight_layout()
-        st.pyplot();
+        fig.update_xaxes(title_text="Tipo de ocorrência", showgrid=False,
+                         titlefont=dict(family='Arial',
+                                        size=axes_size,
+                                        color='#000000'),
+                         )
+        fig.update_yaxes(title_text="Número de ocorrências", showgrid=False,
+                         titlefont=dict(family='Arial',
+                                        size=axes_size,
+                                        color='#000000'),
+                         )
+        fig.update_layout(title=dict(text="Distribuição das ocorrências por tipo",
+                                     yref='container',  # ['paper', 'container']
+                                     xref='container',  # ['paper', 'container']
+                                     x=0.5, y=0.93,
+                                     yanchor="auto",  # ['auto', 'top', 'middle', 'bottom']
+                                     xanchor="auto",  # ['auto', 'left', 'center', 'right']
+                                     font=dict(family='Arial',
+                                               # "Arial", "Balto", "Courier New", "Droid Sans", "Droid Serif", "Droid Sans Mono", "Gravitas One", "Old Standard TT", "Open Sans", "Overpass", "PT Sans Narrow", "Raleway", "Times New Roman"
+                                               size=25,
+                                               color='#000000')),
+                          height=500, width=800,
+                          showlegend=False, hovermode="closest",
+                          barmode='stack', yaxis={'categoryorder':'total descending'})
+        st.plotly_chart(fig)

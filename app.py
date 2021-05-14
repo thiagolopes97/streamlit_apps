@@ -8,6 +8,12 @@ from parts.inicio import inicio_func
 from parts.about import about_func
 from parts.cenipa import cenipa_func
 from parts.filtro import filtro_func
+
+st.set_page_config(page_title="Multi App - Thiago Lopes",
+                   page_icon=":computer:",
+                   layout="wide",
+                   initial_sidebar_state="collapsed")
+
 #from parts.mlapp import mlapp_func
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
