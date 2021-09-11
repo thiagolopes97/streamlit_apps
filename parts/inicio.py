@@ -19,7 +19,7 @@ def inicio_func():
                 Para saber mais sobre a Masterclass, acesse [esta página](https://pay.hotmart.com/K44730436X?checkoutMode=10&bid=1608039415553).
                 Link do [Script](https://github.com/thiagolopes97/streamlit_apps/blob/master/parts/filtro.py) no Github.""")
     st.subheader("Exemplo de funcionalidade do app")
-    col1, col2 = st.beta_columns(2)
+    col1, col2 = st.columns(2)
 
     our_image = Image.open("images/empty.jpg")
     exe_image = Image.open("images/img1.jpg")

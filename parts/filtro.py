@@ -22,7 +22,7 @@ def filtro_func():
     st.subheader("Carregar arquivo de imagem")
     image_file = st.file_uploader("Escolha uma imagem", type=['jpg', 'jpeg', 'png'])
 
-    col1, col2 = st.beta_columns(2)
+    col1, col2 = st.columns(2)
 
     if image_file is not None:
 
